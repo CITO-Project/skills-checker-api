@@ -29,6 +29,11 @@ export class Question extends Entity {
 
   @property({
     type: 'string',
+  })
+  pedagogical_type?: string;
+
+  @property({
+    type: 'string',
     required: true,
   })
   question: string;
@@ -44,13 +49,6 @@ export class Question extends Entity {
     type: 'string',
   })
   description?: string;
-
-  @property({
-    type: 'number',
-    required: true,
-  })
-  skill: number;
-
 
   constructor(data?: Partial<Question>) {
     super(data);
