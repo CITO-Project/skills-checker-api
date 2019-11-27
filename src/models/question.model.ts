@@ -17,9 +17,8 @@ export class Question extends Entity {
 
   @property({
     type: 'number',
-    required: true,
   })
-  scenario: number;
+  scenario?: number;
 
   @property({
     type: 'string',
