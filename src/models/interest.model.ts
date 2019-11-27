@@ -30,13 +30,12 @@ export class Interest extends Entity {
   @property({
     type: 'string',
   })
-  illustration?: string;
+  resource?: string;
 
   @property({
     type: 'string',
   })
   description?: string;
-
 
   constructor(data?: Partial<Interest>) {
     super(data);
