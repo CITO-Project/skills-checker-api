@@ -1,4 +1,6 @@
-import {Entity, model, property} from '@loopback/repository';
+import {Entity, model, property, belongsTo} from '@loopback/repository';
+import {Product} from './product.model';
+import {Interest} from './interest.model';
 
 @model()
 export class Scenario extends Entity {
@@ -8,18 +10,6 @@ export class Scenario extends Entity {
     generated: true,
   })
   id?: number;
-
-  @property({
-    type: 'number',
-    required: true,
-  })
-  product: number;
-
-  @property({
-    type: 'number',
-    required: true,
-  })
-  interest: number;
 
   @property({
     type: 'string',
@@ -48,6 +38,12 @@ export class Scenario extends Entity {
     type: 'string',
   })
   description?: string;
+
+  @belongsTo(() => Product)
+  product: number;
+
+  @belongsTo(() => Interest)
+  interest: number;
 
   constructor(data?: Partial<Scenario>) {
     super(data);
