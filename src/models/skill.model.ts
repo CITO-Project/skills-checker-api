@@ -1,7 +1,7 @@
 import {Entity, model, property} from '@loopback/repository';
 
 @model()
-export class Interest extends Entity {
+export class Skill extends Entity {
   @property({
     type: 'number',
     id: true,
@@ -30,20 +30,21 @@ export class Interest extends Entity {
   @property({
     type: 'string',
   })
-  resource?: string;
+  description?: string;
 
   @property({
     type: 'string',
   })
-  description?: string;
+  illustration?: string;
 
-  constructor(data?: Partial<Interest>) {
+
+  constructor(data?: Partial<Skill>) {
     super(data);
   }
 }
 
-export interface InterestRelations {
+export interface SkillRelations {
   // describe navigational properties here
 }
 
-export type InterestWithRelations = Interest & InterestRelations;
+export type SkillWithRelations = Skill & SkillRelations;
