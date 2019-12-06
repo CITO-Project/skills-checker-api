@@ -4,6 +4,7 @@ import {
   Filter,
   repository,
   Where,
+  FilterBuilder,
 } from '@loopback/repository';
 import {
   post,
@@ -18,13 +19,19 @@ import {
   requestBody,
 } from '@loopback/rest';
 import {Interest} from '../models';
-import {InterestRepository} from '../repositories';
+import {InterestRepository, ProductRepository} from '../repositories';
+import {CommonController} from './common.controller';
 
 export class InterestController {
+  private commonController: CommonController;
   constructor(
     @repository(InterestRepository)
     public interestRepository: InterestRepository,
-  ) {}
+    @repository(ProductRepository)
+    public productRepository: ProductRepository,
+  ) {
+    this.commonController = new CommonController(productRepository);
+  }
 
   // @post('/interests', {
   //   responses: {
@@ -64,7 +71,7 @@ export class InterestController {
   //   return this.interestRepository.count(where);
   // }
 
-  @get('/interests', {
+  @get('/{productname}/interests', {
     responses: {
       '200': {
         description: 'Array of Interest model instances',
@@ -77,9 +84,13 @@ export class InterestController {
     },
   })
   async find(
+    @param.path.string('productname') productname: string,
     @param.query.object('filter', getFilterSchemaFor(Interest))
     filter?: Filter<Interest>,
   ): Promise<Interest[]> {
+    filter = this.initializeFilter(filter);
+    let productid = await this.commonController.checkProduct(productname);
+    this.setFilter(filter, productid);
     return this.interestRepository.find(filter);
   }
 
@@ -162,4 +173,14 @@ export class InterestController {
   // async deleteById(@param.path.number('id') id: number): Promise<void> {
   //   await this.interestRepository.deleteById(id);
   // }
+
+  initializeFilter(filter: Filter<Interest> | undefined): Filter<Interest> {
+    return this.commonController.initializeFilter(filter, 'Interest');
+  }
+
+  setFilter(filter: Filter<Interest>, productid: number): void {
+    filter.where = {
+      product: productid,
+    };
+  }
 }

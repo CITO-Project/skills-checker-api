@@ -18,13 +18,19 @@ import {
   requestBody,
 } from '@loopback/rest';
 import {Scenario} from '../models';
-import {ScenarioRepository} from '../repositories';
+import {ScenarioRepository, ProductRepository} from '../repositories';
+import {CommonController} from './common.controller';
 
 export class ScenarioController {
+  private commonController: CommonController;
   constructor(
     @repository(ScenarioRepository)
     public scenarioRepository: ScenarioRepository,
-  ) {}
+    @repository(ProductRepository)
+    public productRepository: ProductRepository,
+  ) {
+    this.commonController = new CommonController(productRepository);
+  }
 
   // @post('/scenarios', {
   //   responses: {
@@ -64,7 +70,7 @@ export class ScenarioController {
   //   return this.scenarioRepository.count(where);
   // }
 
-  @get('/scenarios', {
+  @get('/{productname}/interests/{interestid}/scenarios', {
     responses: {
       '200': {
         description: 'Array of Scenario model instances',
@@ -77,9 +83,14 @@ export class ScenarioController {
     },
   })
   async find(
+    @param.path.string('productname') productname: string,
+    @param.path.number('interestid') interestid: number,
     @param.query.object('filter', getFilterSchemaFor(Scenario))
     filter?: Filter<Scenario>,
   ): Promise<Scenario[]> {
+    filter = this.initializeFilter(filter);
+    let productid = await this.commonController.checkProduct(productname);
+    this.setFilter(filter, productid, interestid);
     return this.scenarioRepository.find(filter);
   }
 
@@ -162,4 +173,19 @@ export class ScenarioController {
   // async deleteById(@param.path.number('id') id: number): Promise<void> {
   //   await this.scenarioRepository.deleteById(id);
   // }
+
+  initializeFilter(filter: Filter<Scenario> | undefined): Filter<Scenario> {
+    return this.commonController.initializeFilter(filter, 'Scenario');
+  }
+
+  setFilter(
+    filter: Filter<Scenario>,
+    productid: number,
+    interestid: number,
+  ): void {
+    filter.where = {
+      product: productid,
+      interest: interestid,
+    };
+  }
 }

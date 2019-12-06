@@ -18,13 +18,19 @@ import {
   requestBody,
 } from '@loopback/rest';
 import {Question} from '../models';
-import {QuestionRepository} from '../repositories';
+import {QuestionRepository, ProductRepository} from '../repositories';
+import {CommonController} from './common.controller';
 
 export class QuestionController {
+  private commonController: CommonController;
   constructor(
     @repository(QuestionRepository)
     public questionRepository: QuestionRepository,
-  ) {}
+    @repository(ProductRepository)
+    public productRepository: ProductRepository,
+  ) {
+    this.commonController = new CommonController(productRepository);
+  }
 
   // @post('/questions', {
   //   responses: {
@@ -64,22 +70,31 @@ export class QuestionController {
   //   return this.questionRepository.count(where);
   // }
 
-  @get('/questions', {
-    responses: {
-      '200': {
-        description: 'Array of Question model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(Question)},
+  @get(
+    '/{productname}/interests/{interestid}/scenarios/{scenarioid}/questions',
+    {
+      responses: {
+        '200': {
+          description: 'Array of Question model instances',
+          content: {
+            'application/json': {
+              schema: {type: 'array', items: getModelSchemaRef(Question)},
+            },
           },
         },
       },
     },
-  })
+  )
   async find(
+    @param.path.string('productname') productname: string,
+    @param.path.number('interestid') interestid: number,
+    @param.path.number('scenarioid') scenarioid: number,
     @param.query.object('filter', getFilterSchemaFor(Question))
     filter?: Filter<Question>,
   ): Promise<Question[]> {
+    filter = this.initializeFilter(filter);
+    let productid = await this.commonController.checkProduct(productname);
+    this.setFilter(filter, productid, scenarioid);
     return this.questionRepository.find(filter);
   }
 
@@ -162,4 +177,19 @@ export class QuestionController {
   // async deleteById(@param.path.number('id') id: number): Promise<void> {
   //   await this.questionRepository.deleteById(id);
   // }
+
+  initializeFilter(filter: Filter<Question> | undefined): Filter<Question> {
+    return this.commonController.initializeFilter(filter, 'Question');
+  }
+
+  setFilter(
+    filter: Filter<Question>,
+    productid: number,
+    scenarioid: number,
+  ): void {
+    filter.where = {
+      product: productid,
+      scenario: scenarioid,
+    };
+  }
 }
