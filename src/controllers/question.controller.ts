@@ -89,10 +89,8 @@ export class QuestionController {
     @param.path.string('productname') productname: string,
     @param.path.number('interestid') interestid: number,
     @param.path.number('scenarioid') scenarioid: number,
-    @param.query.object('filter', getFilterSchemaFor(Question))
-    filter?: Filter<Question>,
   ): Promise<Question[]> {
-    filter = this.initializeFilter(filter);
+    let filter = this.initializeFilter();
     let productid = await this.commonController.checkProduct(productname);
     this.setFilter(filter, productid, scenarioid);
     return this.questionRepository.find(filter);
@@ -178,8 +176,8 @@ export class QuestionController {
   //   await this.questionRepository.deleteById(id);
   // }
 
-  initializeFilter(filter: Filter<Question> | undefined): Filter<Question> {
-    return this.commonController.initializeFilter(filter, 'Question');
+  initializeFilter(): Filter<Question> {
+    return this.commonController.initializeFilter('Question');
   }
 
   setFilter(

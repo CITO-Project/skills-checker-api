@@ -85,10 +85,8 @@ export class ScenarioController {
   async find(
     @param.path.string('productname') productname: string,
     @param.path.number('interestid') interestid: number,
-    @param.query.object('filter', getFilterSchemaFor(Scenario))
-    filter?: Filter<Scenario>,
   ): Promise<Scenario[]> {
-    filter = this.initializeFilter(filter);
+    let filter = this.initializeFilter();
     let productid = await this.commonController.checkProduct(productname);
     this.setFilter(filter, productid, interestid);
     return this.scenarioRepository.find(filter);
@@ -174,8 +172,8 @@ export class ScenarioController {
   //   await this.scenarioRepository.deleteById(id);
   // }
 
-  initializeFilter(filter: Filter<Scenario> | undefined): Filter<Scenario> {
-    return this.commonController.initializeFilter(filter, 'Scenario');
+  initializeFilter(): Filter<Scenario> {
+    return this.commonController.initializeFilter('Scenario');
   }
 
   setFilter(
