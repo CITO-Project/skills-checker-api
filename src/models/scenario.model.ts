@@ -1,6 +1,7 @@
 import {Entity, model, property, belongsTo} from '@loopback/repository';
 import {Product} from './product.model';
 import {Interest} from './interest.model';
+import {Category} from './category.model';
 
 @model()
 export class Scenario extends Entity {
@@ -44,6 +45,9 @@ export class Scenario extends Entity {
 
   @belongsTo(() => Interest)
   interest: number;
+
+  @belongsTo(() => Category)
+  category: number;
 
   constructor(data?: Partial<Scenario>) {
     super(data);
