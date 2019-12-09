@@ -70,20 +70,24 @@ export class ScenarioController {
   //   return this.scenarioRepository.count(where);
   // }
 
-  @get('/{productname}/interests/{interestid}/scenarios', {
-    responses: {
-      '200': {
-        description: 'Array of Scenario model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(Scenario)},
+  @get(
+    '/{productname}/categories/{categoryid}/interests/{interestid}/scenarios',
+    {
+      responses: {
+        '200': {
+          description: 'Array of Scenario model instances',
+          content: {
+            'application/json': {
+              schema: {type: 'array', items: getModelSchemaRef(Scenario)},
+            },
           },
         },
       },
     },
-  })
+  )
   async find(
     @param.path.string('productname') productname: string,
+    @param.path.number('categoryid') categoryid: number,
     @param.path.number('interestid') interestid: number,
   ): Promise<Scenario[]> {
     let filter = this.initializeFilter();
