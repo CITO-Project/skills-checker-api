@@ -85,10 +85,8 @@ export class InterestController {
   })
   async find(
     @param.path.string('productname') productname: string,
-    @param.query.object('filter', getFilterSchemaFor(Interest))
-    filter?: Filter<Interest>,
   ): Promise<Interest[]> {
-    filter = this.initializeFilter(filter);
+    let filter = this.initializeFilter();
     let productid = await this.commonController.checkProduct(productname);
     this.setFilter(filter, productid);
     return this.interestRepository.find(filter);
@@ -174,8 +172,8 @@ export class InterestController {
   //   await this.interestRepository.deleteById(id);
   // }
 
-  initializeFilter(filter: Filter<Interest> | undefined): Filter<Interest> {
-    return this.commonController.initializeFilter(filter, 'Interest');
+  initializeFilter(): Filter<Interest> {
+    return this.commonController.initializeFilter('Interest');
   }
 
   setFilter(filter: Filter<Interest>, productid: number): void {
