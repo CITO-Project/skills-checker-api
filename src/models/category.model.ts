@@ -1,9 +1,8 @@
 import {Entity, model, property, belongsTo} from '@loopback/repository';
 import {Product} from './product.model';
-import {Category} from './category.model';
 
 @model()
-export class Interest extends Entity {
+export class Category extends Entity {
   @property({
     type: 'number',
     id: true,
@@ -19,9 +18,8 @@ export class Interest extends Entity {
 
   @property({
     type: 'string',
-    required: true,
   })
-  text: string;
+  text?: string;
 
   @property({
     type: 'string',
@@ -36,16 +34,13 @@ export class Interest extends Entity {
   @belongsTo(() => Product)
   product: number;
 
-  @belongsTo(() => Category)
-  category: number;
-
-  constructor(data?: Partial<Interest>) {
+  constructor(data?: Partial<Category>) {
     super(data);
   }
 }
 
-export interface InterestRelations {
+export interface CategoryRelations {
   // describe navigational properties here
 }
 
-export type InterestWithRelations = Interest & InterestRelations;
+export type CategoryWithRelations = Category & CategoryRelations;

@@ -17,7 +17,7 @@ import {
   del,
   requestBody,
 } from '@loopback/rest';
-import {Question} from '../models';
+import {Question, Category} from '../models';
 import {QuestionRepository, ProductRepository} from '../repositories';
 import {CommonController} from './common.controller';
 
@@ -71,7 +71,7 @@ export class QuestionController {
   // }
 
   @get(
-    '/{productname}/interests/{interestid}/scenarios/{scenarioid}/questions',
+    '/{productname}/categories/{categoryid}/interests/{interestid}/scenarios/{scenarioid}/questions',
     {
       responses: {
         '200': {
@@ -87,6 +87,7 @@ export class QuestionController {
   )
   async find(
     @param.path.string('productname') productname: string,
+    @param.path.number('categoryid') categoryid: number,
     @param.path.number('interestid') interestid: number,
     @param.path.number('scenarioid') scenarioid: number,
   ): Promise<Question[]> {

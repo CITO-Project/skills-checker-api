@@ -71,7 +71,7 @@ export class InterestController {
   //   return this.interestRepository.count(where);
   // }
 
-  @get('/{productname}/interests', {
+  @get('/{productname}/categories/{categoryid}/interests', {
     responses: {
       '200': {
         description: 'Array of Interest model instances',
@@ -85,10 +85,11 @@ export class InterestController {
   })
   async find(
     @param.path.string('productname') productname: string,
+    @param.path.number('categoryid') categoryid: number,
   ): Promise<Interest[]> {
     let filter = this.initializeFilter();
     let productid = await this.commonController.checkProduct(productname);
-    this.setFilter(filter, productid);
+    this.setFilter(filter, productid, categoryid);
     return this.interestRepository.find(filter);
   }
 
@@ -176,9 +177,14 @@ export class InterestController {
     return this.commonController.initializeFilter('Interest');
   }
 
-  setFilter(filter: Filter<Interest>, productid: number): void {
+  setFilter(
+    filter: Filter<Interest>,
+    productid: number,
+    categoryid: number,
+  ): void {
     filter.where = {
       product: productid,
+      category: categoryid,
     };
   }
 }
