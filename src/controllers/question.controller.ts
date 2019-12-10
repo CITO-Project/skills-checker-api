@@ -4,6 +4,7 @@ import {
   Filter,
   repository,
   Where,
+  FilterBuilder,
 } from '@loopback/repository';
 import {
   post,
@@ -91,9 +92,8 @@ export class QuestionController {
     @param.path.number('interestid') interestid: number,
     @param.path.number('scenarioid') scenarioid: number,
   ): Promise<Question[]> {
-    let filter = this.initializeFilter();
-    let productid = await this.commonController.checkProduct(productname);
-    this.setFilter(filter, productid, scenarioid);
+    const productid = await this.commonController.checkProduct(productname);
+    const filter = this.createFilter(productid, scenarioid);
     return this.questionRepository.find(filter);
   }
 
@@ -177,18 +177,39 @@ export class QuestionController {
   //   await this.questionRepository.deleteById(id);
   // }
 
-  initializeFilter(): Filter<Question> {
-    return this.commonController.initializeFilter('Question');
-  }
-
-  setFilter(
-    filter: Filter<Question>,
-    productid: number,
-    scenarioid: number,
-  ): void {
-    filter.where = {
-      product: productid,
-      scenario: scenarioid,
-    };
+  createFilter(productid: number, scenarioid: number): Filter<Question> {
+    const filter = new FilterBuilder<Question>();
+    filter
+      .fields({
+        id: true,
+        product: true,
+        scenario: true,
+        type: true,
+        question: true,
+        answers: true,
+        pedagogical_type: true,
+        description: true,
+      })
+      .limit(5)
+      .offset(0)
+      .order('id ASC')
+      .where({
+        and: [
+          {
+            product: productid,
+          },
+          {
+            or: [
+              {
+                scenario: scenarioid,
+              },
+              {
+                scenario: 0,
+              },
+            ],
+          },
+        ],
+      });
+    return filter.build();
   }
 }

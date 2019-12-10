@@ -4,6 +4,7 @@ import {
   Filter,
   repository,
   Where,
+  FilterBuilder,
 } from '@loopback/repository';
 import {
   post,
@@ -85,9 +86,8 @@ export class CategoryController {
   async find(
     @param.path.string('productname') productname: string,
   ): Promise<Category[]> {
-    let filter = this.initializeFilter();
-    let productid = await this.commonController.checkProduct(productname);
-    this.setFilter(filter, productid);
+    const productid = await this.commonController.checkProduct(productname);
+    const filter = this.createFilter(productid);
     return this.categoryRepository.find(filter);
   }
 
@@ -171,13 +171,22 @@ export class CategoryController {
   //   await this.categoryRepository.deleteById(id);
   // }
 
-  initializeFilter(): Filter<Category> {
-    return this.commonController.initializeFilter('Category');
-  }
-
-  setFilter(filter: Filter<Category>, productid: number): void {
-    filter.where = {
-      product: productid,
-    };
+  createFilter(productid: number): Filter<Category> {
+    const filter = new FilterBuilder<Category>();
+    filter
+      .fields({
+        id: true,
+        product: true,
+        name: true,
+        text: true,
+        resource: true,
+        description: true,
+      })
+      .offset(0)
+      .order('id ASC')
+      .where({
+        product: productid,
+      });
+    return filter.build();
   }
 }

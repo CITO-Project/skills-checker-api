@@ -27,22 +27,4 @@ export class CommonController {
     });
     return r;
   }
-
-  initializeFilter(type: string): Filter<any> {
-    let r;
-    switch (type.toLowerCase()) {
-      case 'interest':
-        r = new FilterBuilder<Interest>().build();
-        break;
-      case 'scenario':
-        r = new FilterBuilder<Scenario>().build();
-        break;
-      case 'product':
-        r = new FilterBuilder<Product>().build();
-        break;
-      default:
-        r = new FilterBuilder<any>().build();
-    }
-    return r;
-  }
 }
