@@ -1,5 +1,5 @@
 import {Filter, repository, FilterBuilder} from '@loopback/repository';
-import {Interest, Scenario} from '../models';
+import {Interest, Scenario, Product} from '../models';
 import {ProductRepository} from '../repositories';
 import {inject} from '@loopback/testlab';
 import {PostgresqlDataSource} from '../datasources';
@@ -25,24 +25,6 @@ export class CommonController {
       const productid = !!product && !!product.id ? product.id : -1;
       resolve(productid);
     });
-    return r;
-  }
-
-  initializeFilter(filter: Filter<any> | undefined, type: string): Filter<any> {
-    let r;
-    if (!filter) {
-      switch (type.toLowerCase()) {
-        case 'interest':
-          r = new FilterBuilder<Interest>().build();
-          break;
-        case 'scenario':
-          r = new FilterBuilder<Scenario>().build();
-        default:
-          r = new FilterBuilder<any>().build();
-      }
-    } else {
-      r = filter;
-    }
     return r;
   }
 }

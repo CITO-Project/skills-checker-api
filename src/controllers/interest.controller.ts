@@ -71,7 +71,7 @@ export class InterestController {
   //   return this.interestRepository.count(where);
   // }
 
-  @get('/{productname}/interests', {
+  @get('/{productname}/categories/{categoryid}/interests', {
     responses: {
       '200': {
         description: 'Array of Interest model instances',
@@ -85,12 +85,10 @@ export class InterestController {
   })
   async find(
     @param.path.string('productname') productname: string,
-    @param.query.object('filter', getFilterSchemaFor(Interest))
-    filter?: Filter<Interest>,
+    @param.path.number('categoryid') categoryid: number,
   ): Promise<Interest[]> {
-    filter = this.initializeFilter(filter);
-    let productid = await this.commonController.checkProduct(productname);
-    this.setFilter(filter, productid);
+    const productid = await this.commonController.checkProduct(productname);
+    const filter = this.createFilter(productid, categoryid);
     return this.interestRepository.find(filter);
   }
 
@@ -174,13 +172,24 @@ export class InterestController {
   //   await this.interestRepository.deleteById(id);
   // }
 
-  initializeFilter(filter: Filter<Interest> | undefined): Filter<Interest> {
-    return this.commonController.initializeFilter(filter, 'Interest');
-  }
-
-  setFilter(filter: Filter<Interest>, productid: number): void {
-    filter.where = {
-      product: productid,
-    };
+  createFilter(productid: number, categoryid: number): Filter<Interest> {
+    const filter = new FilterBuilder<Interest>();
+    filter
+      .fields({
+        id: true,
+        product: true,
+        category: true,
+        name: true,
+        text: true,
+        resource: true,
+        description: true,
+      })
+      .offset(0)
+      .order('id ASC')
+      .where({
+        product: productid,
+        category: categoryid,
+      });
+    return filter.build();
   }
 }

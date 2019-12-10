@@ -4,6 +4,7 @@ import {
   Filter,
   repository,
   Where,
+  FilterBuilder,
 } from '@loopback/repository';
 import {
   post,
@@ -70,27 +71,28 @@ export class ScenarioController {
   //   return this.scenarioRepository.count(where);
   // }
 
-  @get('/{productname}/interests/{interestid}/scenarios', {
-    responses: {
-      '200': {
-        description: 'Array of Scenario model instances',
-        content: {
-          'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(Scenario)},
+  @get(
+    '/{productname}/categories/{categoryid}/interests/{interestid}/scenarios',
+    {
+      responses: {
+        '200': {
+          description: 'Array of Scenario model instances',
+          content: {
+            'application/json': {
+              schema: {type: 'array', items: getModelSchemaRef(Scenario)},
+            },
           },
         },
       },
     },
-  })
+  )
   async find(
     @param.path.string('productname') productname: string,
+    @param.path.number('categoryid') categoryid: number,
     @param.path.number('interestid') interestid: number,
-    @param.query.object('filter', getFilterSchemaFor(Scenario))
-    filter?: Filter<Scenario>,
   ): Promise<Scenario[]> {
-    filter = this.initializeFilter(filter);
-    let productid = await this.commonController.checkProduct(productname);
-    this.setFilter(filter, productid, interestid);
+    const productid = await this.commonController.checkProduct(productname);
+    const filter = this.createFilter(productid, interestid);
     return this.scenarioRepository.find(filter);
   }
 
@@ -174,18 +176,26 @@ export class ScenarioController {
   //   await this.scenarioRepository.deleteById(id);
   // }
 
-  initializeFilter(filter: Filter<Scenario> | undefined): Filter<Scenario> {
-    return this.commonController.initializeFilter(filter, 'Scenario');
-  }
-
-  setFilter(
-    filter: Filter<Scenario>,
-    productid: number,
-    interestid: number,
-  ): void {
-    filter.where = {
-      product: productid,
-      interest: interestid,
-    };
+  createFilter(productid: number, interestid: number): Filter<Scenario> {
+    const filter = new FilterBuilder<Scenario>();
+    filter
+      .fields({
+        id: true,
+        product: true,
+        interest: true,
+        name: true,
+        text: true,
+        level: true,
+        resource: true,
+        description: true,
+      })
+      .limit(4)
+      .offset(0)
+      .order('level ASC')
+      .where({
+        product: productid,
+        interest: interestid,
+      });
+    return filter.build();
   }
 }
