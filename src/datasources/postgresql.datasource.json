@@ -2,9 +2,9 @@
   "name": "postgresql",
   "connector": "postgresql",
   "url": "",
-  "host": "localhost",
+  "host": "postgres",
   "port": 5432,
-  "user": "develop",
-  "password": "",
+  "user": "postgres",
+  "password": "postgres",
   "database": "skillschecker"
 }
