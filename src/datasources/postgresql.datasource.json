@@ -2,7 +2,7 @@
   "name": "postgresql",
   "connector": "postgresql",
   "url": "",
-  "host": "postgres",
+  "host": "localhost",
   "port": 5432,
   "user": "postgres",
   "password": "postgres",
