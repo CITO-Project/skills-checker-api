@@ -179,6 +179,7 @@ export class CategoryController {
         product: true,
         name: true,
         text: true,
+        colour: true,
         resource: true,
         description: true,
       })
