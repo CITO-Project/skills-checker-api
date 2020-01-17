@@ -24,7 +24,7 @@ export class Category extends Entity {
   @property({
     type: 'string',
   })
-  color?: string;
+  colour?: string;
 
   @property({
     type: 'string',
