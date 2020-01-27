@@ -3,4 +3,4 @@ export * from './interest.controller';
 export * from './scenario.controller';
 export * from './question.controller';
 export * from './category.controller';
-export * from './courses.controller';
+export * from './course.controller';
