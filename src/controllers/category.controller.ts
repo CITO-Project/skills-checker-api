@@ -18,24 +18,26 @@ import {
   del,
   requestBody,
 } from '@loopback/rest';
-import {Product} from '../models';
-import {ProductRepository} from '../repositories';
+import {Category} from '../models';
+import {CategoryRepository, ProductRepository} from '../repositories';
 import {CommonController} from './common.controller';
 
-export class ProductController {
+export class CategoryController {
   private commonController: CommonController;
   constructor(
+    @repository(CategoryRepository)
+    public categoryRepository: CategoryRepository,
     @repository(ProductRepository)
     public productRepository: ProductRepository,
   ) {
     this.commonController = new CommonController(productRepository);
   }
 
-  // @post('/products', {
+  // @post('/categories', {
   //   responses: {
   //     '200': {
-  //       description: 'Product model instance',
-  //       content: {'application/json': {schema: getModelSchemaRef(Product)}},
+  //       description: 'Category model instance',
+  //       content: {'application/json': {schema: getModelSchemaRef(Category)}},
   //     },
   //   },
   // })
@@ -43,39 +45,39 @@ export class ProductController {
   //   @requestBody({
   //     content: {
   //       'application/json': {
-  //         schema: getModelSchemaRef(Product, {
-  //           title: 'NewProduct',
+  //         schema: getModelSchemaRef(Category, {
+  //           title: 'NewCategory',
   //           exclude: ['id'],
   //         }),
   //       },
   //     },
   //   })
-  //   product: Omit<Product, 'id'>,
-  // ): Promise<Product> {
-  //   return this.productRepository.create(product);
+  //   category: Omit<Category, 'id'>,
+  // ): Promise<Category> {
+  //   return this.categoryRepository.create(category);
   // }
 
-  // @get('/products/count', {
+  // @get('/categories/count', {
   //   responses: {
   //     '200': {
-  //       description: 'Product model count',
+  //       description: 'Category model count',
   //       content: {'application/json': {schema: CountSchema}},
   //     },
   //   },
   // })
   // async count(
-  //   @param.query.object('where', getWhereSchemaFor(Product)) where?: Where<Product>,
+  //   @param.query.object('where', getWhereSchemaFor(Category)) where?: Where<Category>,
   // ): Promise<Count> {
-  //   return this.productRepository.count(where);
+  //   return this.categoryRepository.count(where);
   // }
 
-  @get('/{productname}/product', {
+  @get('/{productname}/categories', {
     responses: {
       '200': {
-        description: 'Array of Product model instances',
+        description: 'Array of Category model instances',
         content: {
           'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(Product)},
+            schema: {type: 'array', items: getModelSchemaRef(Category)},
           },
         },
       },
@@ -83,16 +85,16 @@ export class ProductController {
   })
   async find(
     @param.path.string('productname') productname: string,
-  ): Promise<Product[]> {
+  ): Promise<Category[]> {
     const productid = await this.commonController.checkProduct(productname);
     const filter = this.createFilter(productid);
-    return this.productRepository.find(filter);
+    return this.categoryRepository.find(filter);
   }
 
-  // @patch('/products', {
+  // @patch('/categories', {
   //   responses: {
   //     '200': {
-  //       description: 'Product PATCH success count',
+  //       description: 'Category PATCH success count',
   //       content: {'application/json': {schema: CountSchema}},
   //     },
   //   },
@@ -101,32 +103,32 @@ export class ProductController {
   //   @requestBody({
   //     content: {
   //       'application/json': {
-  //         schema: getModelSchemaRef(Product, {partial: true}),
+  //         schema: getModelSchemaRef(Category, {partial: true}),
   //       },
   //     },
   //   })
-  //   product: Product,
-  //   @param.query.object('where', getWhereSchemaFor(Product)) where?: Where<Product>,
+  //   category: Category,
+  //   @param.query.object('where', getWhereSchemaFor(Category)) where?: Where<Category>,
   // ): Promise<Count> {
-  //   return this.productRepository.updateAll(product, where);
+  //   return this.categoryRepository.updateAll(category, where);
   // }
 
-  // @get('/products/{id}', {
+  // @get('/categories/{id}', {
   //   responses: {
   //     '200': {
-  //       description: 'Product model instance',
-  //       content: {'application/json': {schema: getModelSchemaRef(Product)}},
+  //       description: 'Category model instance',
+  //       content: {'application/json': {schema: getModelSchemaRef(Category)}},
   //     },
   //   },
   // })
-  // async findById(@param.path.number('id') id: number): Promise<Product> {
-  //   return this.productRepository.findById(id);
+  // async findById(@param.path.number('id') id: number): Promise<Category> {
+  //   return this.categoryRepository.findById(id);
   // }
 
-  // @patch('/products/{id}', {
+  // @patch('/categories/{id}', {
   //   responses: {
   //     '204': {
-  //       description: 'Product PATCH success',
+  //       description: 'Category PATCH success',
   //     },
   //   },
   // })
@@ -135,53 +137,56 @@ export class ProductController {
   //   @requestBody({
   //     content: {
   //       'application/json': {
-  //         schema: getModelSchemaRef(Product, {partial: true}),
+  //         schema: getModelSchemaRef(Category, {partial: true}),
   //       },
   //     },
   //   })
-  //   product: Product,
+  //   category: Category,
   // ): Promise<void> {
-  //   await this.productRepository.updateById(id, product);
+  //   await this.categoryRepository.updateById(id, category);
   // }
 
-  // @put('/products/{id}', {
+  // @put('/categories/{id}', {
   //   responses: {
   //     '204': {
-  //       description: 'Product PUT success',
+  //       description: 'Category PUT success',
   //     },
   //   },
   // })
   // async replaceById(
   //   @param.path.number('id') id: number,
-  //   @requestBody() product: Product,
+  //   @requestBody() category: Category,
   // ): Promise<void> {
-  //   await this.productRepository.replaceById(id, product);
+  //   await this.categoryRepository.replaceById(id, category);
   // }
 
-  // @del('/products/{id}', {
+  // @del('/categories/{id}', {
   //   responses: {
   //     '204': {
-  //       description: 'Product DELETE success',
+  //       description: 'Category DELETE success',
   //     },
   //   },
   // })
   // async deleteById(@param.path.number('id') id: number): Promise<void> {
-  //   await this.productRepository.deleteById(id);
+  //   await this.categoryRepository.deleteById(id);
   // }
 
-  createFilter(productid: number): Filter<Product> {
-    const filter = new FilterBuilder<Product>();
+  createFilter(productid: number): Filter<Category> {
+    const filter = new FilterBuilder<Category>();
     filter
       .fields({
         id: true,
+        product: true,
         name: true,
+        text: true,
+        colour: true,
+        resource: true,
         description: true,
       })
-      .limit(1)
       .offset(0)
       .order('id ASC')
       .where({
-        id: productid,
+        product: productid,
       });
     return filter.build();
   }

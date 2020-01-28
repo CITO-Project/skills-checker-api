@@ -1,9 +1,8 @@
 import {Entity, model, property, belongsTo} from '@loopback/repository';
 import {Product} from './product.model';
-import {Scenario} from './scenario.model';
 
 @model()
-export class Question extends Entity {
+export class Course extends Entity {
   @property({
     type: 'number',
     id: true,
@@ -15,44 +14,54 @@ export class Question extends Entity {
     type: 'string',
     required: true,
   })
-  type: string;
-
-  @property({
-    type: 'string',
-  })
-  pedagogical_type?: string;
+  name: string;
 
   @property({
     type: 'string',
     required: true,
   })
-  question: string;
-
-  @property({
-    type: 'array',
-    itemType: 'string',
-    required: true,
-  })
-  answers: string[];
+  title: string;
 
   @property({
     type: 'string',
   })
   description?: string;
 
+  @property({
+    type: 'number',
+  })
+  level?: number;
+
+  @property({
+    type: 'string',
+  })
+  skill?: string;
+
+  @property({
+    type: 'string',
+  })
+  location?: string;
+
+  @property({
+    type: 'date',
+  })
+  date?: string;
+
+  @property({
+    type: 'string',
+  })
+  link?: string;
+
   @belongsTo(() => Product)
   product: number;
 
-  @belongsTo(() => Scenario)
-  scenario: number;
-
-  constructor(data?: Partial<Question>) {
+  constructor(data?: Partial<Course>) {
     super(data);
   }
 }
 
-export interface QuestionRelations {
+export interface CourseRelations {
   // describe navigational properties here
 }
 
-export type QuestionWithRelations = Question & QuestionRelations;
+export type CourseWithRelations = Course & CourseRelations;

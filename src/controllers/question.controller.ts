@@ -4,6 +4,7 @@ import {
   Filter,
   repository,
   Where,
+  FilterBuilder,
 } from '@loopback/repository';
 import {
   post,
@@ -17,7 +18,7 @@ import {
   del,
   requestBody,
 } from '@loopback/rest';
-import {Question} from '../models';
+import {Question, Category} from '../models';
 import {QuestionRepository, ProductRepository} from '../repositories';
 import {CommonController} from './common.controller';
 
@@ -71,7 +72,7 @@ export class QuestionController {
   // }
 
   @get(
-    '/{productname}/interests/{interestid}/scenarios/{scenarioid}/questions',
+    '/{productname}/categories/{categoryid}/interests/{interestid}/scenarios/{scenarioid}/questions',
     {
       responses: {
         '200': {
@@ -87,12 +88,12 @@ export class QuestionController {
   )
   async find(
     @param.path.string('productname') productname: string,
+    @param.path.number('categoryid') categoryid: number,
     @param.path.number('interestid') interestid: number,
     @param.path.number('scenarioid') scenarioid: number,
   ): Promise<Question[]> {
-    let filter = this.initializeFilter();
-    let productid = await this.commonController.checkProduct(productname);
-    this.setFilter(filter, productid, scenarioid);
+    const productid = await this.commonController.checkProduct(productname);
+    const filter = this.createFilter(productid, scenarioid);
     return this.questionRepository.find(filter);
   }
 
@@ -176,18 +177,39 @@ export class QuestionController {
   //   await this.questionRepository.deleteById(id);
   // }
 
-  initializeFilter(): Filter<Question> {
-    return this.commonController.initializeFilter('Question');
-  }
-
-  setFilter(
-    filter: Filter<Question>,
-    productid: number,
-    scenarioid: number,
-  ): void {
-    filter.where = {
-      product: productid,
-      scenario: scenarioid,
-    };
+  createFilter(productid: number, scenarioid: number): Filter<Question> {
+    const filter = new FilterBuilder<Question>();
+    filter
+      .fields({
+        id: true,
+        product: true,
+        scenario: true,
+        type: true,
+        question: true,
+        answers: true,
+        pedagogical_type: true,
+        description: true,
+      })
+      .limit(5)
+      .offset(0)
+      .order('id ASC')
+      .where({
+        and: [
+          {
+            product: productid,
+          },
+          {
+            or: [
+              {
+                scenario: scenarioid,
+              },
+              {
+                scenario: 0,
+              },
+            ],
+          },
+        ],
+      });
+    return filter.build();
   }
 }
