@@ -211,34 +211,38 @@ export class CourseController {
           gte: new Date().toString(),
         },
         location,
-        or: [
+        and: [
           {
-            and: [
+            or: [
               {
-                skill: 'literacy',
+                and: [
+                  {
+                    skill: 'literacy',
+                  },
+                  {
+                    level: literacyLvl || 0,
+                  },
+                ],
               },
               {
-                level: literacyLvl,
-              },
-            ],
-          },
-          {
-            and: [
-              {
-                skill: 'numeracy',
-              },
-              {
-                level: numeracyLvl,
-              },
-            ],
-          },
-          {
-            and: [
-              {
-                skill: 'digital_skills',
+                and: [
+                  {
+                    skill: 'numeracy',
+                  },
+                  {
+                    level: numeracyLvl || 0,
+                  },
+                ],
               },
               {
-                level: digitalSkillsLvl,
+                and: [
+                  {
+                    skill: 'digital_skills',
+                  },
+                  {
+                    level: digitalSkillsLvl || 0,
+                  },
+                ],
               },
             ],
           },
