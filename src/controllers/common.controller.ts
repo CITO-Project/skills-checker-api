@@ -1,8 +1,5 @@
-import {Filter, repository, FilterBuilder} from '@loopback/repository';
-import {Interest, Scenario, Product} from '../models';
+import {repository} from '@loopback/repository';
 import {ProductRepository} from '../repositories';
-import {inject} from '@loopback/testlab';
-import {PostgresqlDataSource} from '../datasources';
 
 export class CommonController {
   constructor(
