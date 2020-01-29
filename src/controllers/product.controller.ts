@@ -1,23 +1,5 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-  FilterBuilder,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getFilterSchemaFor,
-  getModelSchemaRef,
-  getWhereSchemaFor,
-  patch,
-  put,
-  del,
-  requestBody,
-} from '@loopback/rest';
+import {Filter, repository, FilterBuilder} from '@loopback/repository';
+import {param, get, getModelSchemaRef} from '@loopback/rest';
 import {Product} from '../models';
 import {ProductRepository} from '../repositories';
 import {CommonController} from './common.controller';
@@ -30,44 +12,6 @@ export class ProductController {
   ) {
     this.commonController = new CommonController(productRepository);
   }
-
-  // @post('/products', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Product model instance',
-  //       content: {'application/json': {schema: getModelSchemaRef(Product)}},
-  //     },
-  //   },
-  // })
-  // async create(
-  //   @requestBody({
-  //     content: {
-  //       'application/json': {
-  //         schema: getModelSchemaRef(Product, {
-  //           title: 'NewProduct',
-  //           exclude: ['id'],
-  //         }),
-  //       },
-  //     },
-  //   })
-  //   product: Omit<Product, 'id'>,
-  // ): Promise<Product> {
-  //   return this.productRepository.create(product);
-  // }
-
-  // @get('/products/count', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Product model count',
-  //       content: {'application/json': {schema: CountSchema}},
-  //     },
-  //   },
-  // })
-  // async count(
-  //   @param.query.object('where', getWhereSchemaFor(Product)) where?: Where<Product>,
-  // ): Promise<Count> {
-  //   return this.productRepository.count(where);
-  // }
 
   @get('/{productname}/product', {
     responses: {
@@ -88,86 +32,6 @@ export class ProductController {
     const filter = this.createFilter(productid);
     return this.productRepository.find(filter);
   }
-
-  // @patch('/products', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Product PATCH success count',
-  //       content: {'application/json': {schema: CountSchema}},
-  //     },
-  //   },
-  // })
-  // async updateAll(
-  //   @requestBody({
-  //     content: {
-  //       'application/json': {
-  //         schema: getModelSchemaRef(Product, {partial: true}),
-  //       },
-  //     },
-  //   })
-  //   product: Product,
-  //   @param.query.object('where', getWhereSchemaFor(Product)) where?: Where<Product>,
-  // ): Promise<Count> {
-  //   return this.productRepository.updateAll(product, where);
-  // }
-
-  // @get('/products/{id}', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Product model instance',
-  //       content: {'application/json': {schema: getModelSchemaRef(Product)}},
-  //     },
-  //   },
-  // })
-  // async findById(@param.path.number('id') id: number): Promise<Product> {
-  //   return this.productRepository.findById(id);
-  // }
-
-  // @patch('/products/{id}', {
-  //   responses: {
-  //     '204': {
-  //       description: 'Product PATCH success',
-  //     },
-  //   },
-  // })
-  // async updateById(
-  //   @param.path.number('id') id: number,
-  //   @requestBody({
-  //     content: {
-  //       'application/json': {
-  //         schema: getModelSchemaRef(Product, {partial: true}),
-  //       },
-  //     },
-  //   })
-  //   product: Product,
-  // ): Promise<void> {
-  //   await this.productRepository.updateById(id, product);
-  // }
-
-  // @put('/products/{id}', {
-  //   responses: {
-  //     '204': {
-  //       description: 'Product PUT success',
-  //     },
-  //   },
-  // })
-  // async replaceById(
-  //   @param.path.number('id') id: number,
-  //   @requestBody() product: Product,
-  // ): Promise<void> {
-  //   await this.productRepository.replaceById(id, product);
-  // }
-
-  // @del('/products/{id}', {
-  //   responses: {
-  //     '204': {
-  //       description: 'Product DELETE success',
-  //     },
-  //   },
-  // })
-  // async deleteById(@param.path.number('id') id: number): Promise<void> {
-  //   await this.productRepository.deleteById(id);
-  // }
 
   createFilter(productid: number): Filter<Product> {
     const filter = new FilterBuilder<Product>();
