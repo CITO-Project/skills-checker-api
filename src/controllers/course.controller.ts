@@ -5,6 +5,7 @@ import {
   repository,
   Where,
   FilterBuilder,
+  WhereBuilder,
 } from '@loopback/repository';
 import {
   post,
@@ -85,12 +86,19 @@ export class CourseController {
   })
   async find(
     @param.path.string('productname') productname: string,
-    @param.query.string('skill') skill: string,
-    @param.query.number('level') level: number,
+    @param.query.number('literacyLvl') literacyLvl: number,
+    @param.query.number('numeracyLvl') numeracyLvl: number,
+    @param.query.number('digitalSkillsLvl') digitalSkillsLvl: number,
     @param.query.string('location') location: string,
   ): Promise<Course[]> {
     const productid = await this.commonController.checkProduct(productname);
-    const filter = this.createFilter(productid, skill, level, location);
+    const filter = this.createFilter(
+      productid,
+      literacyLvl,
+      numeracyLvl,
+      digitalSkillsLvl,
+      location,
+    );
     return this.courseRepository.find(filter);
   }
 
@@ -176,8 +184,9 @@ export class CourseController {
 
   createFilter(
     productid: number,
-    skill: string,
-    level: number,
+    literacyLvl: number,
+    numeracyLvl: number,
+    digitalSkillsLvl: number,
     location: string,
   ): Filter<Course> {
     const filter = new FilterBuilder<Course>();
@@ -201,9 +210,43 @@ export class CourseController {
         date: {
           gte: new Date().toString(),
         },
-        skill,
-        level,
         location,
+        and: [
+          {
+            or: [
+              {
+                and: [
+                  {
+                    skill: 'literacy',
+                  },
+                  {
+                    level: literacyLvl || 0,
+                  },
+                ],
+              },
+              {
+                and: [
+                  {
+                    skill: 'numeracy',
+                  },
+                  {
+                    level: numeracyLvl || 0,
+                  },
+                ],
+              },
+              {
+                and: [
+                  {
+                    skill: 'digital_skills',
+                  },
+                  {
+                    level: digitalSkillsLvl || 0,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       });
     return filter.build();
   }
