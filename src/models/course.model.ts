@@ -80,12 +80,12 @@ export class Course extends Entity {
   @property({
     type: 'date',
   })
-  enrolment_period_start?: string;
+  enrolment_start?: string;
 
   @property({
     type: 'date',
   })
-  enrolment_period_finish?: string;
+  enrolment_finish?: string;
 
   @property({
     type: 'string',
