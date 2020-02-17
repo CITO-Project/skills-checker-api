@@ -186,7 +186,6 @@ export class QuestionController {
         scenario: true,
         type: true,
         question: true,
-        answers: true,
         pedagogical_type: true,
         description: true,
       })
