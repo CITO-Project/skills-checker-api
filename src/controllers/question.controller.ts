@@ -50,13 +50,12 @@ export class QuestionController {
         scenario: true,
         type: true,
         question: true,
-        answers: true,
         pedagogical_type: true,
         description: true,
       })
-      .limit(5)
+      .limit(7)
       .offset(0)
-      .order('id ASC')
+      .order('scenario DESC', 'id ASC')
       .where({
         and: [
           {

@@ -1,6 +1,24 @@
-import {Filter, repository, FilterBuilder} from '@loopback/repository';
-import {param, get, getModelSchemaRef} from '@loopback/rest';
-import {Product} from '../models';
+import {
+  Count,
+  CountSchema,
+  Filter,
+  repository,
+  Where,
+  FilterBuilder,
+} from '@loopback/repository';
+import {
+  post,
+  param,
+  get,
+  getFilterSchemaFor,
+  getModelSchemaRef,
+  getWhereSchemaFor,
+  patch,
+  put,
+  del,
+  requestBody,
+} from '@loopback/rest';
+import {Product, ProductRelations} from '../models';
 import {ProductRepository} from '../repositories';
 import {CommonController} from './common.controller';
 
@@ -27,10 +45,10 @@ export class ProductController {
   })
   async find(
     @param.path.string('productname') productname: string,
-  ): Promise<Product[]> {
+  ): Promise<(Product & ProductRelations) | null> {
     const productid = await this.commonController.checkProduct(productname);
     const filter = this.createFilter(productid);
-    return this.productRepository.find(filter);
+    return this.productRepository.findOne(filter);
   }
 
   createFilter(productid: number): Filter<Product> {

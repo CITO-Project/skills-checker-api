@@ -28,6 +28,11 @@ export class Course extends Entity {
   description?: string;
 
   @property({
+    type: 'string',
+  })
+  text?: string;
+
+  @property({
     type: 'number',
   })
   level?: number;
@@ -45,12 +50,57 @@ export class Course extends Entity {
   @property({
     type: 'date',
   })
-  date?: string;
+  date_start?: string;
+
+  @property({
+    type: 'date',
+  })
+  date_finish?: string;
+
+  @property({
+    type: 'string',
+  })
+  duration?: string;
+
+  @property({
+    type: 'string',
+  })
+  frequency?: string;
+
+  @property({
+    type: 'string',
+  })
+  address?: string;
 
   @property({
     type: 'string',
   })
   link?: string;
+
+  @property({
+    type: 'date',
+  })
+  enrolment_start?: string;
+
+  @property({
+    type: 'date',
+  })
+  enrolment_finish?: string;
+
+  @property({
+    type: 'string',
+  })
+  contact_person?: string;
+
+  @property({
+    type: 'string',
+  })
+  contact_telephone?: string;
+
+  @property({
+    type: 'string',
+  })
+  contact_email?: string;
 
   @belongsTo(() => Product)
   product: number;
