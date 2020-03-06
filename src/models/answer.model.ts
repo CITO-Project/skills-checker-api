@@ -34,6 +34,11 @@ export class Answer extends Entity {
   })
   special?: string;
 
+  @property({
+    type: 'string',
+  })
+  skipTo?: string;
+
   @belongsTo(() => Product)
   product: number;
 

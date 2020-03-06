@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import {Filter, repository, FilterBuilder} from '@loopback/repository';
 import {param, get, getModelSchemaRef} from '@loopback/rest';
 import {Question} from '../models';

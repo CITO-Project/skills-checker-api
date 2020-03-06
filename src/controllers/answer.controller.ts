@@ -1,23 +1,5 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-  FilterBuilder,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getFilterSchemaFor,
-  getModelSchemaRef,
-  getWhereSchemaFor,
-  patch,
-  put,
-  del,
-  requestBody,
-} from '@loopback/rest';
+import {Filter, repository, FilterBuilder} from '@loopback/repository';
+import {param, get, getModelSchemaRef} from '@loopback/rest';
 import {Answer} from '../models';
 import {AnswerRepository, ProductRepository} from '../repositories';
 import {CommonController} from './common.controller';
@@ -191,6 +173,7 @@ export class AnswerController {
         value: true,
         order: true,
         special: true,
+        skipTo: true,
       })
       .offset(0)
       .order('order ASC')
