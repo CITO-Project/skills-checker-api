@@ -5,3 +5,4 @@ export * from './scenario.repository';
 export * from './category.repository';
 export * from './course.repository';
 export * from './answer.repository';
+export * from './question-order.repository';
