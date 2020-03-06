@@ -1,24 +1,7 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-  FilterBuilder,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getFilterSchemaFor,
-  getModelSchemaRef,
-  getWhereSchemaFor,
-  patch,
-  put,
-  del,
-  requestBody,
-} from '@loopback/rest';
-import {Question, Category} from '../models';
+/* eslint-disable @typescript-eslint/camelcase */
+import {Filter, repository, FilterBuilder} from '@loopback/repository';
+import {param, get, getModelSchemaRef} from '@loopback/rest';
+import {Question} from '../models';
 import {QuestionRepository, ProductRepository} from '../repositories';
 import {CommonController} from './common.controller';
 
