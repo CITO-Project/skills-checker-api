@@ -1,70 +1,21 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getFilterSchemaFor,
-  getModelSchemaRef,
-  getWhereSchemaFor,
-  patch,
-  put,
-  del,
-  requestBody,
-} from '@loopback/rest';
+import {Filter, repository, FilterBuilder} from '@loopback/repository';
+import {param, get, getModelSchemaRef} from '@loopback/rest';
 import {QuestionOrder} from '../models';
-import {QuestionOrderRepository} from '../repositories';
+import {QuestionOrderRepository, ProductRepository} from '../repositories';
+import {CommonController} from './common.controller';
 
 export class QuestionOrderController {
+  private commonController: CommonController;
   constructor(
     @repository(QuestionOrderRepository)
-    public questionOrderRepository : QuestionOrderRepository,
-  ) {}
-
-  @post('/questionorder', {
-    responses: {
-      '200': {
-        description: 'QuestionOrder model instance',
-        content: {'application/json': {schema: getModelSchemaRef(QuestionOrder)}},
-      },
-    },
-  })
-  async create(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(QuestionOrder, {
-            title: 'NewQuestionOrder',
-            exclude: ['id'],
-          }),
-        },
-      },
-    })
-    questionOrder: Omit<QuestionOrder, 'id'>,
-  ): Promise<QuestionOrder> {
-    return this.questionOrderRepository.create(questionOrder);
+    public questionOrderRepository: QuestionOrderRepository,
+    @repository(ProductRepository)
+    public productRepository: ProductRepository,
+  ) {
+    this.commonController = new CommonController(productRepository);
   }
 
-  @get('/questionorder/count', {
-    responses: {
-      '200': {
-        description: 'QuestionOrder model count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async count(
-    @param.query.object('where', getWhereSchemaFor(QuestionOrder)) where?: Where<QuestionOrder>,
-  ): Promise<Count> {
-    return this.questionOrderRepository.count(where);
-  }
-
-  @get('/questionorder', {
+  @get('/{productname}/questionorder', {
     responses: {
       '200': {
         description: 'Array of QuestionOrder model instances',
@@ -77,88 +28,28 @@ export class QuestionOrderController {
     },
   })
   async find(
-    @param.query.object('filter', getFilterSchemaFor(QuestionOrder)) filter?: Filter<QuestionOrder>,
+    @param.path.string('productname') productname: string,
   ): Promise<QuestionOrder[]> {
+    const productid = await this.commonController.checkProduct(productname);
+    const filter = this.createFilter(productid);
     return this.questionOrderRepository.find(filter);
   }
 
-  @patch('/questionorder', {
-    responses: {
-      '200': {
-        description: 'QuestionOrder PATCH success count',
-        content: {'application/json': {schema: CountSchema}},
-      },
-    },
-  })
-  async updateAll(
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(QuestionOrder, {partial: true}),
-        },
-      },
-    })
-    questionOrder: QuestionOrder,
-    @param.query.object('where', getWhereSchemaFor(QuestionOrder)) where?: Where<QuestionOrder>,
-  ): Promise<Count> {
-    return this.questionOrderRepository.updateAll(questionOrder, where);
-  }
-
-  @get('/questionorder/{id}', {
-    responses: {
-      '200': {
-        description: 'QuestionOrder model instance',
-        content: {'application/json': {schema: getModelSchemaRef(QuestionOrder)}},
-      },
-    },
-  })
-  async findById(@param.path.number('id') id: number): Promise<QuestionOrder> {
-    return this.questionOrderRepository.findById(id);
-  }
-
-  @patch('/questionorder/{id}', {
-    responses: {
-      '204': {
-        description: 'QuestionOrder PATCH success',
-      },
-    },
-  })
-  async updateById(
-    @param.path.number('id') id: number,
-    @requestBody({
-      content: {
-        'application/json': {
-          schema: getModelSchemaRef(QuestionOrder, {partial: true}),
-        },
-      },
-    })
-    questionOrder: QuestionOrder,
-  ): Promise<void> {
-    await this.questionOrderRepository.updateById(id, questionOrder);
-  }
-
-  @put('/questionorder/{id}', {
-    responses: {
-      '204': {
-        description: 'QuestionOrder PUT success',
-      },
-    },
-  })
-  async replaceById(
-    @param.path.number('id') id: number,
-    @requestBody() questionOrder: QuestionOrder,
-  ): Promise<void> {
-    await this.questionOrderRepository.replaceById(id, questionOrder);
-  }
-
-  @del('/questionorder/{id}', {
-    responses: {
-      '204': {
-        description: 'QuestionOrder DELETE success',
-      },
-    },
-  })
-  async deleteById(@param.path.number('id') id: number): Promise<void> {
-    await this.questionOrderRepository.deleteById(id);
+  createFilter(productid: number): Filter<QuestionOrder> {
+    const filter = new FilterBuilder<QuestionOrder>();
+    filter
+      .fields({
+        id: true,
+        product: true,
+        name: true,
+        order: true,
+        description: true,
+      })
+      .offset(0)
+      .order('order ASC')
+      .where({
+        product: productid,
+      });
+    return filter.build();
   }
 }

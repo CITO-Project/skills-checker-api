@@ -1,23 +1,5 @@
-import {
-  Count,
-  CountSchema,
-  Filter,
-  repository,
-  Where,
-  FilterBuilder,
-} from '@loopback/repository';
-import {
-  post,
-  param,
-  get,
-  getFilterSchemaFor,
-  getModelSchemaRef,
-  getWhereSchemaFor,
-  patch,
-  put,
-  del,
-  requestBody,
-} from '@loopback/rest';
+import {Filter, repository, FilterBuilder} from '@loopback/repository';
+import {param, get, getModelSchemaRef} from '@loopback/rest';
 import {Scenario} from '../models';
 import {ScenarioRepository, ProductRepository} from '../repositories';
 import {CommonController} from './common.controller';
