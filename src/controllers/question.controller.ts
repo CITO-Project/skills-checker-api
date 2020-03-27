@@ -1,197 +1,95 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import {Filter, repository, FilterBuilder} from '@loopback/repository';
-import {param, get, getModelSchemaRef} from '@loopback/rest';
-import {Question} from '../models';
-import {QuestionRepository, ProductRepository} from '../repositories';
-import {CommonController} from './common.controller';
+import { Filter, repository, FilterBuilder } from '@loopback/repository';
+import { param, get, getModelSchemaRef } from '@loopback/rest';
+import { Question } from '../models';
+import { QuestionRepository, ProductRepository, AnswerRepository } from '../repositories';
+import { CommonController } from './common.controller';
+import { AnswerController } from './answer.controller';
 
 export class QuestionController {
-  private commonController: CommonController;
-  constructor(
-    @repository(QuestionRepository)
-    public questionRepository: QuestionRepository,
-    @repository(ProductRepository)
-    public productRepository: ProductRepository,
-  ) {
-    this.commonController = new CommonController(productRepository);
-  }
+	private commonController: CommonController;
+	private answerController: AnswerController;
+	constructor(
+		@repository(QuestionRepository)
+		public questionRepository: QuestionRepository,
+		@repository(ProductRepository)
+		public productRepository: ProductRepository,
+		@repository(AnswerRepository)
+		public answerRepository: AnswerRepository
+	) {
+		this.commonController = new CommonController(productRepository);
+		this.answerController = new AnswerController(answerRepository, productRepository);
+	}
 
-  // @post('/questions', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Question model instance',
-  //       content: {'application/json': {schema: getModelSchemaRef(Question)}},
-  //     },
-  //   },
-  // })
-  // async create(
-  //   @requestBody({
-  //     content: {
-  //       'application/json': {
-  //         schema: getModelSchemaRef(Question, {
-  //           title: 'NewQuestion',
-  //           exclude: ['id'],
-  //         }),
-  //       },
-  //     },
-  //   })
-  //   question: Omit<Question, 'id'>,
-  // ): Promise<Question> {
-  //   return this.questionRepository.create(question);
-  // }
+	@get(
+		'/{productname}/categories/{categoryid}/interests/{interestid}/scenarios/{scenarioid}/questions',
+		{
+			responses: {
+				'200': {
+					description: 'Array of Question model instances',
+					content: {
+						'application/json': {
+							schema: { type: 'array', items: getModelSchemaRef(Question) },
+						},
+					},
+				},
+			},
+		},
+	)
+	async find(
+		@param.path.string('productname') productname: string,
+		@param.path.number('categoryid') categoryid: number,
+		@param.path.number('interestid') interestid: number,
+		@param.path.number('scenarioid') scenarioid: number,
+	): Promise<Question[]> {
+		const productid = await this.commonController.checkProduct(productname);
+		const filter = this.createFilter(productid, scenarioid);
+		let questions: any[] = [];
+		await this.questionRepository.find(filter).then((data: Question[]) => {
+			if (data.length > 0) {
+				questions = data;
+			}
+		});
+		for (let i = 0; i < questions.length; i++) {
+			const answers = await this.answerRepository.find(this.answerController.createFilter(productid, questions[i].id as number));
+			questions[i].answers = answers
+		}
+		// console.log(questions);
+		return questions;
+	}
 
-  // @get('/questions/count', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Question model count',
-  //       content: {'application/json': {schema: CountSchema}},
-  //     },
-  //   },
-  // })
-  // async count(
-  //   @param.query.object('where', getWhereSchemaFor(Question)) where?: Where<Question>,
-  // ): Promise<Count> {
-  //   return this.questionRepository.count(where);
-  // }
+	createFilter(productid: number, scenarioid: number): Filter<Question> {
+		const filter = new FilterBuilder<Question>();
+		filter
+			.fields({
+				id: true,
+				product: true,
+				scenario: true,
+				type: true,
+				question: true,
+				pedagogical_type: true,
+				description: true,
+			})
+			.offset(0)
+			.order('scenario DESC', 'id ASC')
+			.where({
+				and: [
+					{
+						product: productid,
+					},
+					{
+						or: [
+							{
+								scenario: scenarioid,
+							},
+							{
+								scenario: 0,
+							},
+						],
+					},
+				],
+			});
+		return filter.build();
+	}
 
-  @get(
-    '/{productname}/categories/{categoryid}/interests/{interestid}/scenarios/{scenarioid}/questions',
-    {
-      responses: {
-        '200': {
-          description: 'Array of Question model instances',
-          content: {
-            'application/json': {
-              schema: {type: 'array', items: getModelSchemaRef(Question)},
-            },
-          },
-        },
-      },
-    },
-  )
-  async find(
-    @param.path.string('productname') productname: string,
-    @param.path.number('categoryid') categoryid: number,
-    @param.path.number('interestid') interestid: number,
-    @param.path.number('scenarioid') scenarioid: number,
-  ): Promise<Question[]> {
-    const productid = await this.commonController.checkProduct(productname);
-    const filter = this.createFilter(productid, scenarioid);
-    return this.questionRepository.find(filter);
-  }
-
-  // @patch('/questions', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Question PATCH success count',
-  //       content: {'application/json': {schema: CountSchema}},
-  //     },
-  //   },
-  // })
-  // async updateAll(
-  //   @requestBody({
-  //     content: {
-  //       'application/json': {
-  //         schema: getModelSchemaRef(Question, {partial: true}),
-  //       },
-  //     },
-  //   })
-  //   question: Question,
-  //   @param.query.object('where', getWhereSchemaFor(Question)) where?: Where<Question>,
-  // ): Promise<Count> {
-  //   return this.questionRepository.updateAll(question, where);
-  // }
-
-  // @get('/questions/{id}', {
-  //   responses: {
-  //     '200': {
-  //       description: 'Question model instance',
-  //       content: {'application/json': {schema: getModelSchemaRef(Question)}},
-  //     },
-  //   },
-  // })
-  // async findById(@param.path.number('id') id: number): Promise<Question> {
-  //   return this.questionRepository.findById(id);
-  // }
-
-  // @patch('/questions/{id}', {
-  //   responses: {
-  //     '204': {
-  //       description: 'Question PATCH success',
-  //     },
-  //   },
-  // })
-  // async updateById(
-  //   @param.path.number('id') id: number,
-  //   @requestBody({
-  //     content: {
-  //       'application/json': {
-  //         schema: getModelSchemaRef(Question, {partial: true}),
-  //       },
-  //     },
-  //   })
-  //   question: Question,
-  // ): Promise<void> {
-  //   await this.questionRepository.updateById(id, question);
-  // }
-
-  // @put('/questions/{id}', {
-  //   responses: {
-  //     '204': {
-  //       description: 'Question PUT success',
-  //     },
-  //   },
-  // })
-  // async replaceById(
-  //   @param.path.number('id') id: number,
-  //   @requestBody() question: Question,
-  // ): Promise<void> {
-  //   await this.questionRepository.replaceById(id, question);
-  // }
-
-  // @del('/questions/{id}', {
-  //   responses: {
-  //     '204': {
-  //       description: 'Question DELETE success',
-  //     },
-  //   },
-  // })
-  // async deleteById(@param.path.number('id') id: number): Promise<void> {
-  //   await this.questionRepository.deleteById(id);
-  // }
-
-  createFilter(productid: number, scenarioid: number): Filter<Question> {
-    const filter = new FilterBuilder<Question>();
-    filter
-      .fields({
-        id: true,
-        product: true,
-        scenario: true,
-        type: true,
-        question: true,
-        pedagogical_type: true,
-        description: true,
-      })
-      .limit(7)
-      .offset(0)
-      .order('scenario DESC', 'id ASC')
-      .where({
-        and: [
-          {
-            product: productid,
-          },
-          {
-            or: [
-              {
-                scenario: scenarioid,
-              },
-              {
-                scenario: 0,
-              },
-            ],
-          },
-        ],
-      });
-    return filter.build();
-  }
 }
