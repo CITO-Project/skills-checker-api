@@ -22,7 +22,7 @@ export class QuestionController {
 	}
 
 	@get(
-		'/{productname}/categories/{categoryid}/interests/{interestid}/scenarios/{scenarioid}/questions',
+		'/{productname}/interests/{interestid}/scenarios/{scenarioid}/questions',
 		{
 			responses: {
 				'200': {
@@ -37,6 +37,41 @@ export class QuestionController {
 		},
 	)
 	async find(
+		@param.path.string('productname') productname: string,
+		@param.path.number('interestid') interestid: number,
+		@param.path.number('scenarioid') scenarioid: number,
+	): Promise<Question[]> {
+		const productid = await this.commonController.checkProduct(productname);
+		const filter = this.createFilter(productid, scenarioid);
+		let questions: any[] = [];
+		await this.questionRepository.find(filter).then((data: Question[]) => {
+			if (data.length > 0) {
+				questions = data;
+			}
+		});
+		for (let i = 0; i < questions.length; i++) {
+			const answers = await this.answerRepository.find(this.answerController.createFilter(productid, questions[i].id as number));
+			questions[i].answers = answers
+		}
+		return questions;
+	}
+
+	@get(
+		'/{productname}/categories/{categoryid}/interests/{interestid}/scenarios/{scenarioid}/questions',
+		{
+			responses: {
+				'200': {
+					description: 'Array of Question model instances',
+					content: {
+						'application/json': {
+							schema: { type: 'array', items: getModelSchemaRef(Question) },
+						},
+					},
+				},
+			},
+		},
+	)
+	async findByCategory(
 		@param.path.string('productname') productname: string,
 		@param.path.number('categoryid') categoryid: number,
 		@param.path.number('interestid') interestid: number,
@@ -54,7 +89,6 @@ export class QuestionController {
 			const answers = await this.answerRepository.find(this.answerController.createFilter(productid, questions[i].id as number));
 			questions[i].answers = answers
 		}
-		// console.log(questions);
 		return questions;
 	}
 
