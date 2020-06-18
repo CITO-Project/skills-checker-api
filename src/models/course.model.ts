@@ -1,5 +1,5 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
-import {Product} from './product.model';
+import { Entity, model, property, belongsTo } from '@loopback/repository';
+import { Product } from './product.model';
 
 @model()
 export class Course extends Entity {
@@ -12,13 +12,11 @@ export class Course extends Entity {
 
   @property({
     type: 'string',
-    required: true,
   })
-  name: string;
+  external_id?: number;
 
   @property({
     type: 'string',
-    required: true,
   })
   title: string;
 
@@ -26,11 +24,6 @@ export class Course extends Entity {
     type: 'string',
   })
   description?: string;
-
-  @property({
-    type: 'string',
-  })
-  text?: string;
 
   @property({
     type: 'number',
@@ -46,26 +39,6 @@ export class Course extends Entity {
     type: 'string',
   })
   location?: string;
-
-  @property({
-    type: 'date',
-  })
-  date_start?: string;
-
-  @property({
-    type: 'date',
-  })
-  date_finish?: string;
-
-  @property({
-    type: 'string',
-  })
-  duration?: string;
-
-  @property({
-    type: 'string',
-  })
-  frequency?: string;
 
   @property({
     type: 'string',
@@ -101,6 +74,11 @@ export class Course extends Entity {
     type: 'string',
   })
   contact_email?: string;
+
+  @property({
+    type: 'string',
+  })
+  contact_attention?: string;
 
   @belongsTo(() => Product)
   product: number;
