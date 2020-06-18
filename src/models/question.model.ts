@@ -1,8 +1,8 @@
-import {Entity, model, property, belongsTo} from '@loopback/repository';
-import {Product} from './product.model';
-import {Scenario} from './scenario.model';
+import { Entity, model, property, belongsTo } from '@loopback/repository';
+import { Product } from './product.model';
+import { Scenario } from './scenario.model';
 
-@model()
+@model({ settings: { strict: false } })
 export class Question extends Entity {
   @property({
     type: 'number',
@@ -29,16 +29,15 @@ export class Question extends Entity {
   question: string;
 
   @property({
-    type: 'array',
-    itemType: 'string',
-    required: true,
-  })
-  answers: string[];
-
-  @property({
     type: 'string',
   })
   description?: string;
+
+  // Define well-known properties here
+
+  // Indexer property to allow additional data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [prop: string]: any;
 
   @belongsTo(() => Product)
   product: number;

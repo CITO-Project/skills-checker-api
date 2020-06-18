@@ -1,8 +1,8 @@
-import {Filter, repository, FilterBuilder} from '@loopback/repository';
-import {param, get, getModelSchemaRef} from '@loopback/rest';
-import {Scenario} from '../models';
-import {ScenarioRepository, ProductRepository} from '../repositories';
-import {CommonController} from './common.controller';
+import { Filter, repository, FilterBuilder } from '@loopback/repository';
+import { param, get, getModelSchemaRef } from '@loopback/rest';
+import { Scenario } from '../models';
+import { ScenarioRepository, ProductRepository } from '../repositories';
+import { CommonController } from './common.controller';
 
 export class ScenarioController {
   private commonController: CommonController;
@@ -16,14 +16,14 @@ export class ScenarioController {
   }
 
   @get(
-    '/{productname}/categories/{categoryid}/interests/{interestid}/scenarios',
+    '/{productname}/interests/{interestid}/scenarios',
     {
       responses: {
         '200': {
           description: 'Array of Scenario model instances',
           content: {
             'application/json': {
-              schema: {type: 'array', items: getModelSchemaRef(Scenario)},
+              schema: { type: 'array', items: getModelSchemaRef(Scenario) },
             },
           },
         },
@@ -31,6 +31,30 @@ export class ScenarioController {
     },
   )
   async find(
+    @param.path.string('productname') productname: string,
+    @param.path.number('interestid') interestid: number,
+  ): Promise<Scenario[]> {
+    const productid = await this.commonController.checkProduct(productname);
+    const filter = this.createFilter(productid, interestid);
+    return this.scenarioRepository.find(filter);
+  }
+
+  @get(
+    '/{productname}/categories/{categoryid}/interests/{interestid}/scenarios',
+    {
+      responses: {
+        '200': {
+          description: 'Array of Scenario model instances',
+          content: {
+            'application/json': {
+              schema: { type: 'array', items: getModelSchemaRef(Scenario) },
+            },
+          },
+        },
+      },
+    },
+  )
+  async findByCategory(
     @param.path.string('productname') productname: string,
     @param.path.number('categoryid') categoryid: number,
     @param.path.number('interestid') interestid: number,

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import {Filter, repository, FilterBuilder} from '@loopback/repository';
 import {param, get, getModelSchemaRef} from '@loopback/rest';
-import {Course} from '../models';
+import {Course, CourseRelations} from '../models';
 import {CourseRepository, ProductRepository} from '../repositories';
 import {CommonController} from './common.controller';
 
@@ -45,6 +46,57 @@ export class CourseController {
     return this.courseRepository.find(filter);
   }
 
+  @get('/{productname}/courses/{id}', {
+    responses: {
+      '200': {
+        description: 'Course model instance',
+        content: {'application/json': {schema: getModelSchemaRef(Course)}},
+      },
+    },
+  })
+  async findById(
+    @param.path.string('productname') productname: string,
+    @param.path.number('id') id: number,
+  ): Promise<(Course & CourseRelations) | null> {
+    const productid = await this.commonController.checkProduct(productname);
+    const filter = this.createFilterId(productid, id);
+    return this.courseRepository.findOne(filter);
+  }
+
+  createFilterId(productid: number, courseid: number): Filter<Course> {
+    const filter = new FilterBuilder<Course>();
+    filter
+      .fields({
+        id: true,
+        product: true,
+        name: true,
+        title: true,
+        description: true,
+        text: true,
+        level: true,
+        skill: true,
+        location: true,
+        date_start: true,
+        date_finish: true,
+        duration: true,
+        frequency: true,
+        address: true,
+        link: true,
+        enrolment_start: true,
+        enrolment_finish: true,
+        contact_person: true,
+        contact_telephone: true,
+        contact_email: true,
+      })
+      .offset(0)
+      .order('id ASC')
+      .where({
+        id: courseid,
+        product: productid,
+      });
+    return filter.build();
+  }
+
   createFilter(
     productid: number,
     literacyLvl: number,
@@ -60,17 +112,27 @@ export class CourseController {
         name: true,
         title: true,
         description: true,
+        text: true,
         level: true,
         skill: true,
         location: true,
-        date: true,
+        date_start: true,
+        date_finish: true,
+        duration: true,
+        frequency: true,
+        address: true,
         link: true,
+        enrolment_start: true,
+        enrolment_finish: true,
+        contact_person: true,
+        contact_telephone: true,
+        contact_email: true,
       })
       .offset(0)
       .order('id ASC')
       .where({
         product: productid,
-        date: {
+        enrolment_finish: {
           gte: new Date().toString(),
         },
         location,

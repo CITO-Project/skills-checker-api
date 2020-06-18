@@ -1,8 +1,8 @@
-import {Filter, repository, FilterBuilder} from '@loopback/repository';
-import {param, get, getModelSchemaRef} from '@loopback/rest';
-import {Interest} from '../models';
-import {InterestRepository, ProductRepository} from '../repositories';
-import {CommonController} from './common.controller';
+import { Filter, repository, FilterBuilder } from '@loopback/repository';
+import { param, get, getModelSchemaRef } from '@loopback/rest';
+import { Interest } from '../models';
+import { InterestRepository, ProductRepository } from '../repositories';
+import { CommonController } from './common.controller';
 
 export class InterestController {
   private commonController: CommonController;
@@ -21,13 +21,13 @@ export class InterestController {
         description: 'Array of Interest model instances',
         content: {
           'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(Interest)},
+            schema: { type: 'array', items: getModelSchemaRef(Interest) },
           },
         },
       },
     },
   })
-  async find(
+  async findByCategory(
     @param.path.string('productname') productname: string,
     @param.path.number('categoryid') categoryid: number,
   ): Promise<Interest[]> {
@@ -36,7 +36,27 @@ export class InterestController {
     return this.interestRepository.find(filter);
   }
 
-  createFilter(productid: number, categoryid: number): Filter<Interest> {
+  @get('/{productname}/interests', {
+    responses: {
+      '200': {
+        description: 'Array of Interest model instances',
+        content: {
+          'application/json': {
+            schema: { type: 'array', items: getModelSchemaRef(Interest) },
+          },
+        },
+      },
+    },
+  })
+  async find(
+    @param.path.string('productname') productname: string,
+  ): Promise<Interest[]> {
+    const productid = await this.commonController.checkProduct(productname);
+    const filter = this.createFilter(productid);
+    return this.interestRepository.find(filter);
+  }
+
+  createFilter(productid: number, categoryid?: number): Filter<Interest> {
     const filter = new FilterBuilder<Interest>();
     filter
       .fields({
@@ -49,11 +69,14 @@ export class InterestController {
         description: true,
       })
       .offset(0)
-      .order('id ASC')
-      .where({
-        product: productid,
-        category: categoryid,
-      });
+      .order('id ASC');
+    const _where: any = {
+      product: productid
+    }
+    if (!!categoryid) {
+      _where['category'] = categoryid;
+    }
+    filter.where(_where);
     return filter.build();
   }
 }

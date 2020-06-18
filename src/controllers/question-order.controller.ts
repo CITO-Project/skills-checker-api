@@ -1,25 +1,27 @@
 import {Filter, repository, FilterBuilder} from '@loopback/repository';
 import {param, get, getModelSchemaRef} from '@loopback/rest';
-import {Product, ProductRelations} from '../models';
-import {ProductRepository} from '../repositories';
+import {QuestionOrder} from '../models';
+import {QuestionOrderRepository, ProductRepository} from '../repositories';
 import {CommonController} from './common.controller';
 
-export class ProductController {
+export class QuestionOrderController {
   private commonController: CommonController;
   constructor(
+    @repository(QuestionOrderRepository)
+    public questionOrderRepository: QuestionOrderRepository,
     @repository(ProductRepository)
     public productRepository: ProductRepository,
   ) {
     this.commonController = new CommonController(productRepository);
   }
 
-  @get('/{productname}/product', {
+  @get('/{productname}/questionorder', {
     responses: {
       '200': {
-        description: 'Array of Product model instances',
+        description: 'Array of QuestionOrder model instances',
         content: {
           'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(Product)},
+            schema: {type: 'array', items: getModelSchemaRef(QuestionOrder)},
           },
         },
       },
@@ -27,25 +29,26 @@ export class ProductController {
   })
   async find(
     @param.path.string('productname') productname: string,
-  ): Promise<(Product & ProductRelations) | null> {
+  ): Promise<QuestionOrder[]> {
     const productid = await this.commonController.checkProduct(productname);
     const filter = this.createFilter(productid);
-    return this.productRepository.findOne(filter);
+    return this.questionOrderRepository.find(filter);
   }
 
-  createFilter(productid: number): Filter<Product> {
-    const filter = new FilterBuilder<Product>();
+  createFilter(productid: number): Filter<QuestionOrder> {
+    const filter = new FilterBuilder<QuestionOrder>();
     filter
       .fields({
         id: true,
+        product: true,
         name: true,
+        order: true,
         description: true,
       })
-      .limit(1)
       .offset(0)
-      .order('id ASC')
+      .order('order ASC')
       .where({
-        id: productid,
+        product: productid,
       });
     return filter.build();
   }
