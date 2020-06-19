@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import {Filter, repository, FilterBuilder} from '@loopback/repository';
-import {param, get, getModelSchemaRef} from '@loopback/rest';
-import {Course, CourseRelations} from '../models';
-import {CourseRepository, ProductRepository} from '../repositories';
-import {CommonController} from './common.controller';
+import { Filter, repository, FilterBuilder } from '@loopback/repository';
+import { param, get, getModelSchemaRef } from '@loopback/rest';
+import { Course, CourseRelations } from '../models';
+import { CourseRepository, ProductRepository } from '../repositories';
+import { CommonController } from './common.controller';
 
 export class CourseController {
   private commonController: CommonController;
@@ -22,7 +22,7 @@ export class CourseController {
         description: 'Array of Course model instances',
         content: {
           'application/json': {
-            schema: {type: 'array', items: getModelSchemaRef(Course)},
+            schema: { type: 'array', items: getModelSchemaRef(Course) },
           },
         },
       },
@@ -50,7 +50,7 @@ export class CourseController {
     responses: {
       '200': {
         description: 'Course model instance',
-        content: {'application/json': {schema: getModelSchemaRef(Course)}},
+        content: { 'application/json': { schema: getModelSchemaRef(Course) } },
       },
     },
   })
@@ -68,23 +68,19 @@ export class CourseController {
     filter
       .fields({
         id: true,
+        external_id: true,
         product: true,
-        name: true,
         title: true,
         description: true,
-        text: true,
         level: true,
         skill: true,
         location: true,
-        date_start: true,
-        date_finish: true,
-        duration: true,
-        frequency: true,
         address: true,
         link: true,
         enrolment_start: true,
         enrolment_finish: true,
         contact_person: true,
+        contact_attention: true,
         contact_telephone: true,
         contact_email: true,
       })
@@ -108,23 +104,19 @@ export class CourseController {
     filter
       .fields({
         id: true,
+        external_id: true,
         product: true,
-        name: true,
         title: true,
         description: true,
-        text: true,
         level: true,
         skill: true,
         location: true,
-        date_start: true,
-        date_finish: true,
-        duration: true,
-        frequency: true,
         address: true,
         link: true,
         enrolment_start: true,
         enrolment_finish: true,
         contact_person: true,
+        contact_attention: true,
         contact_telephone: true,
         contact_email: true,
       })
@@ -132,9 +124,6 @@ export class CourseController {
       .order('id ASC')
       .where({
         product: productid,
-        enrolment_finish: {
-          gte: new Date().toString(),
-        },
         location,
         and: [
           {
@@ -170,7 +159,7 @@ export class CourseController {
                 ],
               },
             ],
-          },
+          }
         ],
       });
     return filter.build();
