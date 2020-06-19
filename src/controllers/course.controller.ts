@@ -151,7 +151,7 @@ export class CourseController {
               {
                 and: [
                   {
-                    skill: 'digital_skills',
+                    skill: 'digital',
                   },
                   {
                     level: digitalSkillsLvl || 0,
