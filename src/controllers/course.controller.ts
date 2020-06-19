@@ -124,9 +124,6 @@ export class CourseController {
       .order('id ASC')
       .where({
         product: productid,
-        enrolment_finish: {
-          gte: new Date().toString(),
-        },
         location,
         and: [
           {
@@ -162,20 +159,6 @@ export class CourseController {
                 ],
               },
             ],
-          },
-          {
-            or: [
-              {
-                enrolment_finish: {
-                  lte: new Date(0).toString()
-                }
-              },
-              {
-                enrolment_finish: {
-                  gte: new Date().toString(),
-                }
-              }
-            ]
           }
         ],
       });
